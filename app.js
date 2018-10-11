@@ -9,77 +9,55 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, dice;
+var scores, roundScore, activePlayer, gamePlaying;
 
-scores = [0, 0];
-roundScore = 0;
-activePlayer = 1; /* or 1 */
+init();
 
-//dice = Math.floor(Math.random() * 6) + 1; 
-/*random number from 1 to 6: Math.random gives a random num from 0 to 1, Math.floor extracts integer part*/
-
-//document.querySelector('#current-' + activePlayer).textContent = dice; 
-/*The object that gives us access to the DOM is the document object.
-querySelector finds an element in DOM by an id. 
-textContent changes the plain TEXT of the element.*/
-
-//document.querySelector('#current-' + activePlayer).innerHTML = '<em>' + dice + '</em>'; 
-/*innerHTML changes the HTML element*/
-
-//var x = document.querySelector('#score-0').textContent;
-//console.log(x);
-
-document.querySelector('.dice').style.display = 'none';
-/*we change the property in CSS class selector in order to hide the random dice in the begining*/
-
-//document.querySelector('.btn-roll').addEventListener('click', btn); 
-/* We don't put parenthesis here because we actually don't call a function right now, we want it to be called by another function.
-This function is called callback function. We pass it to another function as an argument*/
-
-document.getElementById('score-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('current-1').textContent = '0';
-
-// Anonimus function usage (it's used only once and doesn't have a name):
 document.querySelector('.btn-roll').addEventListener('click', function () {
-	// 1. Random number
-	var dice = Math.floor(Math.random() * 6) + 1;
 
-	// 2. Display the result
-	var diceDOM = document.querySelector('.dice'); 
-	/* not to make selection over and over again while changing CSS properties*/
-	diceDOM.style.display = 'block';
-	diceDOM.src = 'dice-' + dice + '.png';
+	if(gamePlaying) {
+		// 1. Random number
+		var dice = Math.floor(Math.random() * 6) + 1;
+
+		// 2. Display the result
+		var diceDOM = document.querySelector('.dice'); 
+		/* not to make selection over and over again while changing CSS properties*/
+		diceDOM.style.display = 'block';
+		diceDOM.src = 'dice-' + dice + '.png';
 
 
-	// 3. Update the round score IF the rolled number was NOT a 1
-	
-	if (dice !== 1) {
-		//add score
-		roundScore += dice;
-		document.querySelector('#current-' + activePlayer).textContent = roundScore;
-	} else {
-		//next player
-		nextPlayer();
+		// 3. Update the round score IF the rolled number was NOT a 1
+
+		if (dice !== 1) {
+			//add score
+			roundScore += dice;
+			document.querySelector('#current-' + activePlayer).textContent = roundScore;
+		} else {
+			nextPlayer();
+		};
+	}
 });
-	
+
 document.querySelector('.btn-hold').addEventListener('click', function() {
+	if (gamePlaying) {
 		//add current score to global score
 		scores[activePlayer] += roundScore;
 		//update the UI
 		document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 		// check if player won the game
-		if (scores[activePlayer] >= 100) {
+		if (scores[activePlayer] >= 20) {
 			document.querySelector('#name-' + activePlayer).textContent = 'WINNER!';
 			document.querySelector('.dice').style.display = 'none';
-			document.querySelector('.player' + activePlayer + '-panel').classList.add('.winner');
-			document.querySelector('.player' + activePlayer + '-panel').classList.remove('.active');
+			document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+			document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+
+			gamePlaying = false;
 		}
 		else {
 		// next player
 		nextPlayer ();	
 		}
+	}
 		
 })
 
@@ -91,10 +69,33 @@ function nextPlayer() {
 		document.getElementById('current-0').textContent = '0';
 		document.getElementById('current-1').textContent = '0';
 
-		//document.querySelector('.player-0-panel').classList.remove('active');
-		//document.querySelector('.player-1-panel').classList.add('active');
-
 		document.querySelector('.player-0-panel').classList.toggle('active');
 		document.querySelector('.player-1-panel').classList.toggle('active');
 		document.querySelector('.dice').style.display = 'none';
+	};
+
+document.querySelector('.btn-new').addEventListener('click', init);
+
+function init () {
+		scores = [0, 0];
+		roundScore = 0;
+		activePlayer = 0;
+		gamePlaying = true;
+
+		document.querySelector('.dice').style.display = 'none';
+
+		document.getElementById('score-0').textContent = '0';
+		document.getElementById('score-1').textContent = '0';
+		document.getElementById('current-0').textContent = '0';
+		document.getElementById('current-1').textContent = '0';
+
+		document.getElementById('name-0').textContent = 'Player 1';
+		document.getElementById('name-1').textContent = 'Player 2';	
+
+		document.querySelector('.player-0-panel').classList.remove('winner');
+		document.querySelector('.player-1-panel').classList.remove('winner');
+		document.querySelector('.player-0-panel').classList.remove('active');
+		document.querySelector('.player-1-panel').classList.remove('active');
+
+		document.querySelector('.player-0-panel').classList.add('active');
 	};
